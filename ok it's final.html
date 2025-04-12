@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free offline-friendly learning platform for rural communities">
+    <title>EduConnect Lite - Mobile Learning for Rural Areas</title>
+    <style>
+        /* Modernized CSS with improved design */
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #60ad5e;
+            --secondary: #004d40;
+            --secondary-light: #39796b;
+            --light: #f5f5f5;
+            --light-gray: #e0e0e0;
+            --dark: #333;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--secondary);
+            padding: 0.75rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        nav a:hover {
+            background-color: var(--secondary-light);
+        }
+        .container {
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        @media (min-width: 900px) {
+            .container {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+        .card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-top: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: var(--primary-light);
+        }
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        .lesson-item, .quiz-item, .student-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+        .lesson-item:hover, .quiz-item:hover, .student-item:hover {
+            background-color: var(--light-gray);
+        }
+        progress {
+            width: 100%;
+            height: 1rem;
+            border-radius: 4px;
+        }
+        progress::-webkit-progress-bar {
+            background-color: var(--light-gray);
+            border-radius: 4px;
+        }
+        progress::-webkit-progress-value {
+            background-color: var(--primary);
+            border-radius: 4px;
+        }
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--secondary);
+            color: var(--white);
+            margin-top: 2rem;
+        }
+        .login-form {
+            max-width: 500px;
+            margin: 2rem auto;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+        }
+        .hidden {
+            display: none;
+        }
+        
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 350px;
+            max-height: 500px;
+            display: flex;
+            flex-direction: column;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .chatbot-container.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .chatbot-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .chatbot-box {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: 350px;
+            background-color: var(--light);
+        }
+        .chatbot-input-container {
+            display: flex;
+            border-top: 1px solid var(--light-gray);
+            background: var(--white);
+        }
+        .chatbot-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+        }
+        .chatbot-send {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .chatbot-send:hover {
+            background-color: var(--primary-light);
+        }
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        .chatbot-toggle-icon {
+            font-size: 1.5rem;
+        }
+        .message {
+            margin: 0.75rem 0;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        .user-message {
+            background-color: var(--primary);
+            color: var(--white);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        .bot-message {
+            background-color: var(--light-gray);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            nav {
+                flex-direction: column;
+                text-align: center;
+            }
+            nav a {
+                margin-bottom: 0.25rem;
+            }
+            .chatbot-container {
+                width: 90%;
+                right: 5%;
+                bottom: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>EduConnect Lite</h1>
+        <p>Accessible, offline-friendly learning for rural communities</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#lessons">Lessons</a>
+        <a href="#quizzes">Quizzes</a>
+        <a href="#progress">Progress</a>
+        <a href="#teacher">Teacher Portal</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Left Column -->
+        <div>
+            <!-- Login/Signup Section -->
+            <section id="login-section" class="card">
+                <h2>Welcome to EduConnect Lite</h2>
+                <p>Please sign in to continue</p>
+                <div class="login-form">
+                    <div class="form-group">
+                        <label for="username">Phone Number or Email:</label>
+                        <input type="text" id="username" placeholder="e.g. +1234567890">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-type">I am a:</label>
+                        <select id="user-type">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="login()">Login</button>
+                    <p>Don't have an account? <a href="#signup">Sign up</a></p>
+                </div>
+            </section>
+
+            <!-- Student Dashboard (Hidden by default) -->
+            <section id="student-dashboard" class="hidden">
+                <div class="card">
+                    <h2>📚 My Lessons</h2>
+                    <div id="lessons-list">
+                        <div class="lesson-item">
+                            <h3>Mathematics - Basic Arithmetic</h3>
+                            <p>Text lesson | 15 min</p>
+                            <button class="btn">Read Online</button>
+                            <button class="btn btn-outline">Download</button>
+                        </div>
+                        <div class="lesson-item">
+                            <h3>Science - Photosynthesis</h3>
+                            <p>Audio lesson | 8 min</p>
+                            <button class="btn">Play Audio</button>
+                            <button class="btn btn-outline">Download</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📝 Current Quiz</h2>
+                    <div class="quiz-item">
+                        <h3>Math Quiz 1</h3>
+                        <p>5 questions | Due: Tomorrow</p>
+                        <button class="btn">Start Quiz</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📊 My Progress</h2>
+                    <p>Completed: 3 of 10 lessons</p>
+                    <progress value="30" max="100"></progress>
+                    <p>Current streak: 5 days</p>
+                </div>
+            </section>
+
+            <!-- Teacher Dashboard (Hidden by default) -->
+            <section id="teacher-dashboard" class="hidden">
+                <div class="card">
+                    <h2>👨‍🏫 Teacher Dashboard</h2>
+                    <p>Welcome back, Teacher!</p>
+                </div>
+
+                <div class="card">
+                    <h2>📤 Upload New Lesson</h2>
+                    <div class="form-group">
+                        <label for="lesson-title">Lesson Title:</label>
+                        <input type="text" id="lesson-title">
+                    </div>
+                    <div class="form-group">
+                        <label for="lesson-type">Lesson Type:</label>
+                        <select id="lesson-type">
+                            <option value="text">Text Lesson</option>
+                            <option value="audio">Audio Lesson</option>
+                            <option value="pdf">PDF Document</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="lesson-file">Select File:</label>
+                        <input type="file" id="lesson-file">
+                    </div>
+                    <button class="btn">Upload Lesson</button>
+                </div>
+
+                <div class="card">
+                    <h2>👥 My Students</h2>
+                    <div class="student-item">
+                        <h3>Grade 5 Class</h3>
+                        <p>0 students | Average progress: 00%</p>
+                        <button class="btn">View Class</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Offline Mode Notification -->
+            <div id="offline-notice" class="card hidden">
+                <h2>⚠️ Offline Mode</h2>
+                <p>You're currently offline. Some features may be limited.</p>
+                <p>Downloaded lessons and quizzes are still available.</p>
+            </div>
+        </div>
+
+        <!-- Right Column (for larger screens) -->
+        <div>
+            <!-- Resources Section -->
+            <div class="card">
+                <h2>📚 Quick Resources</h2>
+                <div class="lesson-item">
+                    <h3>NCERT Textbooks</h3>
+                    <p>Free downloadable textbooks</p>
+                    <button class="btn">Access Now</button>
+                </div>
+                <div class="lesson-item">
+                    <h3>Scholarships</h3>
+                    <p>Government scholarship information</p>
+                    <button class="btn">Learn More</button>
+                </div>
+            </div>
+
+            <!-- Announcements Section -->
+            <div class="card">
+                <h2>📢 Announcements</h2>
+                <div class="lesson-item">
+                    <h3>New Math Lessons Added</h3>
+                    <p>Check out our new basic arithmetic lessons</p>
+                </div>
+                <div class="lesson-item">
+                    <h3>Offline Mode Improved</h3>
+                    <p>Now supports downloading audio lessons</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>EduConnect Lite - Works on low bandwidth and offline</p>
+        <p>Need help? Send SMS to +1234567890</p>
+    </footer>
+
+    <!-- Chatbot Toggle Button -->
+    <div class="chatbot-toggle" id="chatbot-toggle">
+        <div class="chatbot-toggle-icon">💬</div>
+    </div>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbot-container">
+        <div class="chatbot-header">
+            <div class="chatbot-title">EduHelper Assistant</div>
+            <button class="chatbot-close" id="chatbot-close">×</button>
+        </div>
+        <div class="chatbot-box" id="chatbot-box">
+            <div class="message bot-message">Hello! I'm EduHelper. Ask me anything about study materials, scholarships, or offline learning.</div>
+        </div>
+        <div class="chatbot-input-container">
+            <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Type your message..." />
+            <button class="chatbot-send" id="chatbot-send">Send</button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Check network status
+        function updateOnlineStatus() {
+            if (!navigator.onLine) {
+                document.getElementById('offline-notice').classList.remove('hidden');
+            }
+        }
+        
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+
+        // Simple login function
+        function login() {
+            const username = document.getElementById('username').value;
+            const userType = document.getElementById('user-type').value;
+            
+            if (!username) {
+                alert('Please enter your phone number or email');
+                return;
+            }
+            
+            document.getElementById('login-section').classList.add('hidden');
+            
+            if (userType === 'student') {
+                document.getElementById('student-dashboard').classList.remove('hidden');
+            } else {
+                document.getElementById('teacher-dashboard').classList.remove('hidden');
+            }
+        }
+
+        // Lesson download simulation
+        document.querySelectorAll('.btn').forEach(btn => {
+            if (btn.textContent === 'Download') {
+                btn.addEventListener('click', function() {
+                    alert('Lesson will be available offline after download!');
+                });
+            }
+        });
+
+        // Chatbot functionality
+        const chatbotToggle = document.getElementById('chatbot-toggle');
+        const chatbotContainer = document.getElementById('chatbot-container');
+        const chatbotClose = document.getElementById('chatbot-close');
+        const chatbotSend = document.getElementById('chatbot-send');
+        const chatbotInput = document.getElementById('chatbot-input');
+        const chatbotBox = document.getElementById('chatbot-box');
+
+        chatbotToggle.addEventListener('click', () => {
+            chatbotContainer.classList.toggle('active');
+        });
+
+        chatbotClose.addEventListener('click', () => {
+            chatbotContainer.classList.remove('active');
+        });
+
+        function sendChatbotMessage() {
+            const userInput = chatbotInput.value.trim();
+            if (userInput === "") return;
+
+            // Show user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user-message';
+            userMessage.innerText = userInput;
+            chatbotBox.appendChild(userMessage);
+
+            // Generate and show bot reply
+            const botMessage = document.createElement('div');
+            botMessage.className = 'message bot-message';
+            botMessage.innerText = getBotReply(userInput.toLowerCase());
+            chatbotBox.appendChild(botMessage);
+
+            // Clear input and scroll to bottom
+            chatbotInput.value = '';
+            chatbotBox.scrollTop = chatbotBox.scrollHeight;
+        }
+
+        chatbotSend.addEventListener('click', sendChatbotMessage);
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendChatbotMessage();
+            }
+        });
+
+        function getBotReply(input) {
+            if (input.includes('hello') || input.includes('hi')) {
+                return "Hi there! How can I assist you with your learning today?";
+            } else if (input.includes('notes') || input.includes('material') || input.includes('resources')) {
+                return "You can access free educational resources from:\n1. NCERT Official Website (https://ncert.nic.in)\n2. Diksha App\n3. Our platform's 'Quick Resources' section";
+            } else if (input.includes('scholarship')||input.includes('scholarship')) {
+                return "For scholarships, visit:\n1. National Scholarship Portal (https://scholarships.gov.in)\n2. Check our 'Quick Resources' section\n3. Contact your school administrator";
+            } else if (input.includes('offline') || input.includes('download')) {
+                return "For offline learning:\n1. Use the 'Download' button on lessons\n2. NCERT provides offline books\n3. Our platform works without internet after initial setup";
+            } else if (input.includes('math') || input.includes('mathematics')) {
+                return "We have math resources available:\n1. Basic Arithmetic lessons\n2. Geometry tutorials\n3. Check the 'My Lessons' section after login";
+            } else if (input.includes('bye') || input.includes('goodbye')) {
+                return "Goodbye! Remember, learning is a journey. Come back anytime you need help!";
+            } else if (input.includes('help')) {
+                return "I can help with:\n1. Finding study materials\n2. Scholarship information\n3. Offline learning tips\n4. Navigating EduConnect Lite\nWhat do you need help with?";
+            } else {
+                return "I'm here to help with educational resources. Try asking about:\n- Study materials\n- Scholarships\n- Offline learning\n- Specific subjects";
+            }
+        }
+    </script>
+</body>
+</html>
